@@ -8,7 +8,7 @@ import org.apache.commons.io.filefilter.WildcardFileFilter;
 
 public class Fuentes {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InterruptedException {
 
 		Calendar calendar = Calendar.getInstance();		
 		/* Calendar manual set */
@@ -16,15 +16,38 @@ public class Fuentes {
 		//calendar.set(Calendar.MONTH,0);
 		//calendar.set(Calendar.DAY_OF_MONTH,1);
 		
+		/*
+		Calendar cal = Calendar.getInstance();
+	    SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy");
+	    cal.setTime(sdf.parse("Mon Mar 14 16:02:37 GMT 2011"));// all done
+	    */
 		
-		for (int i = 0; i < 2; i++) {
+		HideToSystemTray frame =  new HideToSystemTray();
+		frame.writeLog("Prueba");
+		
+		
+		int daysToCopy = 40;
+		
+		while(true){
 			
-			calendar.add(Calendar.DATE, -1);
+		
+		
+		
+		calendar.add(Calendar.DATE, -daysToCopy);
+		for (int i = 0; i < daysToCopy; i++) {
+			
+			calendar.add(Calendar.DATE, +1);
+			System.out.println("--" + calendar.getTime());
+			
+			
 			
 			String dayOfMonth = String.format("%02d", calendar.get(Calendar.DAY_OF_MONTH) ) ; 
 			String month_1 = String.format("%02d", calendar.get(Calendar.MONTH)+1);
 			String monthName = MonthName(calendar.get(Calendar.MONTH));
 			int year = calendar.get(Calendar.YEAR);
+			
+			
+			//frame.writeLog("--" + year +" "+ monthName  + " " +  dayOfMonth);
 		
 			String SrcDirBase = "Y:/TOIIP/Fuentes/";
 			String DestDirectory  = DestDirName(calendar);
@@ -35,14 +58,19 @@ public class Fuentes {
 			balanceGraficos.setSrcFile("Balance y Gráficos PR "+dayOfMonth+" "+monthName.toLowerCase().substring(0,3)+" "+year+ ".xlsx"); 
 			balanceGraficos.setDestDir(DestDirectory);
 			balanceGraficos.setDestFile("Balance y gráficos PR_" + year + month_1 + dayOfMonth +".xlsx");
-			balanceGraficos.CopyReport();
+			balanceGraficos.CopyReport(frame);
 			
 			
 			//Crudo por campos
 			
 			
 			//PODIM
-			ReportPodim podim =  new ReportPodim();
+			ReportAgg podim =  new ReportAgg();
+			podim.setSrctDir(SrcDirBase + "PODIM/" + year +"/"+ monthName + "/" );
+			podim.setSrcFile("PODIM"+monthName.toUpperCase()+".xlsm");
+			podim.setDestDir(DestDirectory);
+			podim.setDestFile("PODIM_"+ year + month_1 + dayOfMonth +".xlsm");
+			podim.CopyReportBySDate(calendar,frame);
 			
 			//petroquimicos
 			Report ppq = new Report();
@@ -50,7 +78,7 @@ public class Fuentes {
 			ppq.setSrcFile("ReportPPQ_" + dayOfMonth + month_1 + (year-2000) + ".xlsx");
 			ppq.setDestDir(DestDirectory);
 			ppq.setDestFile("ReportPPQ_"+ year + month_1 + dayOfMonth +".xlsx");
-			ppq.CopyReport();
+			ppq.CopyReport(frame);
 			
 			
 			//Rohoy crudo
@@ -59,7 +87,7 @@ public class Fuentes {
 			rohoy.setSrcFile("Resumen Operativo Crudo "+ dayOfMonth + monthName.toLowerCase().substring(0,3) + (year-2000) + ".xlsx");
 			rohoy.setDestDir(DestDirectory);
 			rohoy.setDestFile("RohoyCrd_" + year + month_1 + dayOfMonth + ".xlsx");
-			rohoy.CopyReport();
+			rohoy.CopyReport(frame);
 			
 			//Ventas diarias
 			Report ventasDiarias = new Report();
@@ -67,12 +95,16 @@ public class Fuentes {
 			ventasDiarias.setSrcFile("Ventas diarias "+ year +" "+ dayOfMonth  +" "+ monthName.toUpperCase() +".xlsx");
 			ventasDiarias.setDestDir(DestDirectory);
 			ventasDiarias.setDestFile("Ventas diarias " + year +  month_1 + dayOfMonth  +".xlsx");
-			ventasDiarias.CopyReport();
-			
+			ventasDiarias.CopyReport(frame);
 			
 			
 		}
 		
+		System.out.println("-- fin del a copia");
+		
+		Thread.sleep(10 * 1000);
+
+		}
 		
 
 
@@ -81,10 +113,11 @@ public class Fuentes {
 	
 	
 	static String DestDirName(Calendar calendar){
+		String DestDirBase = "Y:/Servicio social/2014/Javier Garduño Martinez/PruebasTransitorio Carga Masiva Nuevo TOIIP/";
 		String monthDirName = String.format("%02d", calendar.get(Calendar.MONTH)+1 ) +
 				"_" + MonthName(calendar.get(Calendar.MONTH)).substring(0,3) +
 				"_"+ calendar.get(Calendar.YEAR) + "/";
-		return monthDirName;
+		return DestDirBase+monthDirName;
 	}
 	
 	

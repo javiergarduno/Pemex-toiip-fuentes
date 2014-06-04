@@ -36,23 +36,23 @@ public class Report {
 		DestDir = destDir;
 	}
 	
-	public void CopyReport(){
+	public void CopyReport(HideToSystemTray frame){
 		
 		try {
 			File reportSrcFile = new File(SrcDir + SrcFile);
 			File reportDestFile = new File(DestDir + DestFile);
 			if( reportSrcFile.exists()  && !reportDestFile.exists()){
 				FileUtils.copyFile(reportSrcFile, reportDestFile );
-				System.out.println(reportSrcFile.lastModified());
 
 				System.out.println("Copiado: "+ reportSrcFile.toString() + " -> " + reportDestFile);
+				frame.writeLog("Copiado: "+ reportSrcFile.toString() + " -> " + reportDestFile);
 			}
 			else{
 				if(!reportSrcFile.exists()){
 					System.out.println("No existe el la fuente: \""+ reportSrcFile.toString());
 				}
 				if(reportDestFile.exists()){
-					System.out.println("Ya esxiste el destino " + reportDestFile.toString() + "\"");
+					System.out.println("Ya existe el destino " + reportDestFile.toString() + "\"");
 				}					
 			}
 			
