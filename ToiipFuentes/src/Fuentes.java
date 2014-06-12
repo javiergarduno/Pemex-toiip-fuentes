@@ -26,7 +26,7 @@ public class Fuentes {
 		frame.writeLog("Prueba");
 		
 		
-		int daysToCopy = 40;
+		int daysToCopy = 100;
 		
 		while(true){
 			
@@ -51,16 +51,25 @@ public class Fuentes {
 		
 			String SrcDirBase = "Y:/TOIIP/Fuentes/";
 			String DestDirectory  = DestDirName(calendar);
-			
+			/*
 			//Petroliferos
 			Report balanceGraficos = new Report();
 			balanceGraficos.setSrctDir( SrcDirBase + "Petrolíferos ORIGINALES/" + year + "/" + monthName + "/");			
-			balanceGraficos.setSrcFile("Balance y Gráficos PR "+dayOfMonth+" "+monthName.toLowerCase().substring(0,3)+" "+year+ ".xlsx"); 
+			balanceGraficos.setSrcFile("Balance y gráficos PR "+dayOfMonth+" "+monthName.toLowerCase().substring(0,3)+" "+year+ ".xlsx"); 
 			balanceGraficos.setDestDir(DestDirectory);
 			balanceGraficos.setDestFile("Balance y gráficos PR_" + year + month_1 + dayOfMonth +".xlsx");
 			balanceGraficos.CopyReport(frame);
+			*/
+			//Petroliferos fin de mes
+			Report balanceGraficosCierre = new Report();
+			balanceGraficosCierre.setSrctDir( SrcDirBase + "Petrolíferos ORIGINALES/" + year + "/" + monthName + "/");			
+			balanceGraficosCierre.setSrcFile("Balance y gráficos PR cierre de " + monthName.toLowerCase().substring(0,3)+" "+year+ ".xlsx"); 
+			balanceGraficosCierre.setDestDir(DestDirectory);
+			balanceGraficosCierre.setDestFile("Balance y gráficos PR_" + year + month_1 + dayOfMonth +"cierre.xlsx");
+			//if cierre de mes not exists
+			balanceGraficosCierre.CopyReport(frame);
 			
-			
+			/*
 			//Crudo por campos
 			
 			
@@ -96,7 +105,7 @@ public class Fuentes {
 			ventasDiarias.setDestDir(DestDirectory);
 			ventasDiarias.setDestFile("Ventas diarias " + year +  month_1 + dayOfMonth  +".xlsx");
 			ventasDiarias.CopyReport(frame);
-			
+			*/
 			
 		}
 		
@@ -113,7 +122,7 @@ public class Fuentes {
 	
 	
 	static String DestDirName(Calendar calendar){
-		String DestDirBase = "Y:/Servicio social/2014/Javier Garduño Martinez/PruebasTransitorio Carga Masiva Nuevo TOIIP/";
+		String DestDirBase = "Y:/Servicio social/2014/Javier Garduño/PruebasTransitorio Carga Masiva Nuevo TOIIP/";
 		String monthDirName = String.format("%02d", calendar.get(Calendar.MONTH)+1 ) +
 				"_" + MonthName(calendar.get(Calendar.MONTH)).substring(0,3) +
 				"_"+ calendar.get(Calendar.YEAR) + "/";
