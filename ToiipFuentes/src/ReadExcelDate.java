@@ -33,7 +33,7 @@ public class ReadExcelDate
             switch (cell.getCellType())
             {
                 case Cell.CELL_TYPE_NUMERIC:
-                    System.out.print(cell.getNumericCellValue() + "\t\t");
+                    System.out.print(cell.getNumericCellValue() + "\t\0t");
                     break;
                 case Cell.CELL_TYPE_STRING:
                     System.out.print(cell.getStringCellValue() + "\t\t");
