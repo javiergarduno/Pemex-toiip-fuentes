@@ -1,3 +1,4 @@
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.io.*;
 
@@ -19,15 +20,8 @@ public class Fuentes {
 		//calendar.set(Calendar.MONTH,0);
 		//calendar.set(Calendar.DAY_OF_MONTH,1);
 
-		/*
-		Calendar cal = Calendar.getInstance();
-	    SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy");
-	    cal.setTime(sdf.parse("Mon Mar 14 16:02:37 GMT 2011"));// all done
-		 */
-
 		HideToSystemTray frame =  new HideToSystemTray();
-		frame.writeLog("Prueba");
-
+		
 		int daysToCopy = 2;
 
 		while(true){
@@ -43,32 +37,33 @@ public class Fuentes {
 				String monthName = MonthName(calendar.get(Calendar.MONTH));
 				int year = calendar.get(Calendar.YEAR);
 
-				//frame.writeLog("--" + year +" "+ monthName  + " " +  dayOfMonth);
-
 				String SrcDirBase = "Y:/TOIIP/Fuentes/";
 				String DestDirectory  = DestDirName(calendar);
 
 				//Petroliferos
 				
-				//searchin excel files
-				
+				//searching excel files
+
 				File searchDir = new File(SrcDirBase + "Petrolíferos ORIGINALES/" + year + "/" + monthName + "/");
-				FileFilter fileFilter = new WildcardFileFilter("*");
+				FileFilter fileFilter = new WildcardFileFilter("Balance y gráficos PR*.xlsx");
 				File[] files = searchDir.listFiles(fileFilter);
-				for (int i1 = 0; i1 < files.length; i1++) {
-				  System.out.println(files[i1]);
-				  ReadExcelDate(files[i1]);
+				for (int j = 0; j < files.length; j++) {
+					System.out.println(files[j]);
+					Calendar fileCalendar = ReadExcelDate(files[j]);
+					
+					String fileDayOfMonth = String.format("%02d", fileCalendar.get(Calendar.DAY_OF_MONTH) ) ; 
+					String fileMonth_1 = String.format("%02d", fileCalendar.get(Calendar.MONTH)+1);
+					//String file_MonthName = MonthName(fileCalendar.get(Calendar.MONTH));
+					int fileYear = fileCalendar.get(Calendar.YEAR);
+
+					Report balanceGraficos = new Report(files[j]);
+					//balanceGraficos.setSrctDir( SrcDirBase + "Petrolíferos ORIGINALES/" + year + "/" + monthName + "/");			
+					//balanceGraficos.setSrcFile("Balance y gráficos PR "+dayOfMonth+" "+monthName.toLowerCase().substring(0,3)+" "+year+ ".xlsx"); 
+					balanceGraficos.setDestDir(DestDirectory);
+					balanceGraficos.setDestFile("Balance y gráficos PR_" + fileYear + fileMonth_1 + fileDayOfMonth +".xlsx");
+					balanceGraficos.CopyReport(frame);
+
 				}
-				 
-				/*
-				Report balanceGraficos = new Report();
-				balanceGraficos.setSrctDir( SrcDirBase + "Petrolíferos ORIGINALES/" + year + "/" + monthName + "/");			
-				balanceGraficos.setSrcFile("Balance y gráficos PR "+dayOfMonth+" "+monthName.toLowerCase().substring(0,3)+" "+year+ ".xlsx"); 
-				balanceGraficos.setDestDir(DestDirectory);
-				balanceGraficos.setDestFile("Balance y gráficos PR_" + year + month_1 + dayOfMonth +".xlsx");
-				balanceGraficos.CopyReport(frame);
-				
-				*/
 				
 				
 				/*
@@ -166,7 +161,7 @@ public class Fuentes {
 		return "";
 	}
 	
-	static void  ReadExcelDate(File filepath)
+	static Calendar  ReadExcelDate(File filepath)
     {
         try
         {
@@ -177,31 +172,25 @@ public class Fuentes {
  
             //Get first/desired sheet from the workbook
             XSSFSheet sheet = workbook.getSheetAt(0);
-            Cell cell =  sheet.getRow(10).getCell(41);
-            System.out.println(cell.getDateCellValue()); 
+            Cell cell =  sheet.getRow(9).getCell(41);
+            
+            SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+           String cellValue = sdf.format(cell.getDateCellValue());
+           System.out.println(cellValue); 
+            
             Calendar myCal = Calendar.getInstance();
             myCal.setTime(cell.getDateCellValue());
-            System.out.println(myCal.get(Calendar.DAY_OF_MONTH));
-            /*
-            switch (cell.getCellType())
-            {
-                case Cell.CELL_TYPE_NUMERIC:
-                    System.out.print(cell.getNumericCellValue() + "\t\0t");
-                    break;
-                case Cell.CELL_TYPE_STRING:
-                    System.out.print(cell.getStringCellValue() + "\t\t");
-                    break;
-                case Cell.CELL_TYPE_FORMULA:
-                    //Not again
-                    break;
-            }*/
-                    
             
-            file.close();			
+            System.out.println(myCal.get(Calendar.DAY_OF_MONTH) + "/"
+            		+ myCal.get(Calendar.MONTH)+1 + "/"
+            		+ myCal.get(Calendar.YEAR));            
+            file.close();
+            return myCal;
         }
         catch (Exception e)
         {
             e.printStackTrace();
         }
+		return null;
     }
 }

@@ -6,10 +6,13 @@ import org.apache.commons.io.filefilter.WildcardFileFilter;
 
 
 public class Report {
+	
+	public File SrcFileObj;
 	public String SrcFile;
 	public String SrcDir;
 	public String DestFile;
 	public String DestDir;
+	
 
 	
 	Report(){
@@ -17,6 +20,15 @@ public class Report {
 		SrcDir = null;
 		DestFile = null;
 		DestDir = null;
+		SrcFileObj = null;
+	}
+	
+	Report(File file){
+		SrcFile = null;
+		SrcDir = null;
+		DestFile = null;
+		DestDir = null;
+		SrcFileObj = file;
 	}
 	
 	
@@ -39,7 +51,15 @@ public class Report {
 	public void CopyReport(HideToSystemTray frame){
 		
 		try {
-			File reportSrcFile = new File(SrcDir + SrcFile);
+			File reportSrcFile = null;
+			if(this.SrcFileObj == null){
+				reportSrcFile = new File(SrcDir + SrcFile);
+			}
+			else{
+				reportSrcFile =  this.SrcFileObj;
+			}
+			
+			
 			File reportDestFile = new File(DestDir + DestFile);
 			if( reportSrcFile.exists()  && !reportDestFile.exists()){
 				FileUtils.copyFile(reportSrcFile, reportDestFile );
