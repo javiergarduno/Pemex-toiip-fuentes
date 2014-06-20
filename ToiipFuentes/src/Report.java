@@ -82,6 +82,40 @@ public class Report {
 		}
 	}
 	
+public void OverrideReport(HideToSystemTray frame){
+		
+		try {
+			File reportSrcFile = null;
+			if(this.SrcFileObj == null){
+				reportSrcFile = new File(SrcDir + SrcFile);
+			}
+			else{
+				reportSrcFile =  this.SrcFileObj;
+			}
+			
+			
+			File reportDestFile = new File(DestDir + DestFile);
+			if( reportSrcFile.exists()){
+				FileUtils.copyFile(reportSrcFile, reportDestFile );
+
+				System.out.println("Sobreescribiendo: "+ reportSrcFile.toString() + " -> " + reportDestFile);
+				frame.writeLog("Copiado: "+ reportSrcFile.toString() + " -> " + reportDestFile);
+			}
+			else{
+				if(!reportSrcFile.exists()){
+					System.out.println("No existe el la fuente: \""+ reportSrcFile.toString());
+				}
+				if(reportDestFile.exists()){
+					System.out.println("Ya existe el destino " + reportDestFile.toString() + "\"");
+				}					
+			}
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();			
+		}
+	}
+	
 
 }
 
