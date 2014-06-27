@@ -9,8 +9,8 @@ public class ReportAgg extends Report{
 		
 	ReportAgg() {
 			super();
-		}
-		
+	}
+	
 		
 		public void CopyReportBySDate(Calendar calendar, HideToSystemTray frame){
 			try {

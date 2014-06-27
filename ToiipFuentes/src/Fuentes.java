@@ -6,6 +6,9 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.comparator.NameFileComparator;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -15,38 +18,57 @@ public class Fuentes {
 
 	public static void main(String[] args) throws InterruptedException {
 
-		Calendar calendar = Calendar.getInstance();		
 		/* Calendar manual set */
 		//calendar.set(Calendar.YEAR, 2014);          	
 		//calendar.set(Calendar.MONTH,0);
 		//calendar.set(Calendar.DAY_OF_MONTH,1);
+		String SrcDirBase = "Y:/TOIIP/Fuentes/";
 
 		HideToSystemTray frame =  new HideToSystemTray();
-		
-		int daysToCopy = 33;
-		int monthsToCopy = 4;
+		int monthsToCopy = 6;
 
 		while(true){
+			Calendar calendar = Calendar.getInstance();	
+			System.out.println("--" + calendar.getTime());
+
+			String dayOfMonth = String.format("%02d", calendar.get(Calendar.DAY_OF_MONTH) ) ; 
+			String month_1 = String.format("%02d", calendar.get(Calendar.MONTH)+1);
+			String monthName = MonthName(calendar.get(Calendar.MONTH));
+			int year = calendar.get(Calendar.YEAR);
+
+			String DestDirectory  = DestDirName(calendar);
+			
+			//PODIM			
+			ReportAgg podim =  new ReportAgg();
+			podim.setSrctDir(SrcDirBase + "PODIM/" + year +"/"+ monthName + "/" );
+			podim.setSrcFile("PODIM"+monthName.toUpperCase()+".xlsm");
+			podim.setDestDir(DestDirectory);
+			podim.setDestFile("PODIM_"+ year + month_1 + dayOfMonth +".xlsm");
+			podim.CopyReportBySDate(calendar,frame);
 
 			calendar.add(Calendar.MONTH, -monthsToCopy);
 			
 			for (int i = 0; i < monthsToCopy; i++) {
-
+				System.out.println("i=" + i + "<" + monthsToCopy );
+				System.out.println("dentro del ciclo antes de incremento" + calendar.getTime());
 				calendar.add(Calendar.MONTH, +1);
 				System.out.println("--" + calendar.getTime());
 
-				String dayOfMonth = String.format("%02d", calendar.get(Calendar.DAY_OF_MONTH) ) ; 
-				String month_1 = String.format("%02d", calendar.get(Calendar.MONTH)+1);
-				String monthName = MonthName(calendar.get(Calendar.MONTH));
-				int year = calendar.get(Calendar.YEAR);
+				dayOfMonth = String.format("%02d", calendar.get(Calendar.DAY_OF_MONTH) ) ; 
+				month_1 = String.format("%02d", calendar.get(Calendar.MONTH)+1);
+				monthName = MonthName(calendar.get(Calendar.MONTH) );
+				year = calendar.get(Calendar.YEAR);
 
-				String SrcDirBase = "Y:/TOIIP/Fuentes/";
-				String DestDirectory  = DestDirName(calendar);
+				DestDirectory  = DestDirName(calendar);
 				
 				File searchDir = null;
 				FileFilter fileFilter = null;
+				
+				
+				
+				
 
-				/*
+				
 				//Petroliferos
 				searchDir = new File(SrcDirBase + "Petrolíferos ORIGINALES/" + year + "/" + monthName + "/");
 				fileFilter = new WildcardFileFilter("Balance y ?r?ficos PR*.xlsx");
@@ -56,16 +78,14 @@ public class Fuentes {
 				for (int j = 0; j < filesPetroliferos.length; j++) {
 					System.out.println(filesPetroliferos[j]);				
 										 
-					Calendar fileCalendar = ReadExcelDatePetroligeros(filesPetroliferos[j]);
+					Calendar fileCalendar = ReadExcelDatePetroliferos(filesPetroliferos[j]);
 					
 					String fileDayOfMonth = String.format("%02d", fileCalendar.get(Calendar.DAY_OF_MONTH) ) ; 
 					String fileMonth_1 = String.format("%02d", fileCalendar.get(Calendar.MONTH)+1);
 					//String file_MonthName = MonthName(fileCalendar.get(Calendar.MONTH));
 					int fileYear = fileCalendar.get(Calendar.YEAR);
 
-					Report balanceGraficos = new Report(filesPetroliferos[j]);
-					//balanceGraficos.setSrctDir( SrcDirBase + "Petrolíferos ORIGINALES/" + year + "/" + monthName + "/");			
-					//balanceGraficos.setSrcFile("Balance y gráficos PR "+dayOfMonth+" "+monthName.toLowerCase().substring(0,3)+" "+year+ ".xlsx"); 
+					Report balanceGraficos = new Report(filesPetroliferos[j]);					
 					balanceGraficos.setDestDir(DestDirName(fileCalendar));
 					balanceGraficos.setDestFile("Balance y gráficos PR_" + fileYear + fileMonth_1 + fileDayOfMonth +".xlsx");
 					balanceGraficos.CopyReport(frame);
@@ -74,8 +94,6 @@ public class Fuentes {
 						balanceGraficos.OverrideReport(frame);
 					}					
 				}
-				*/
-				
 				
 				
 				//Petroquimicos
@@ -87,69 +105,111 @@ public class Fuentes {
 				for (int j = 0; j < filesPetroquimicos.length; j++) {
 					System.out.println(filesPetroquimicos[j]);
 					
-										 
 					Calendar fileCalendar = ReadExcelDatePetroqumicos(filesPetroquimicos[j], calendar);
-					/*
+
 					String fileDayOfMonth = String.format("%02d", fileCalendar.get(Calendar.DAY_OF_MONTH) ) ; 
 					String fileMonth_1 = String.format("%02d", fileCalendar.get(Calendar.MONTH)+1);
 					//String file_MonthName = MonthName(fileCalendar.get(Calendar.MONTH));
 					int fileYear = fileCalendar.get(Calendar.YEAR);
 
-					Report balanceGraficos = new Report(filesPetroquimicos[j]);
+					Report petroquimicos = new Report(filesPetroquimicos[j]);					
+					petroquimicos.setDestDir(DestDirName(fileCalendar));
+					petroquimicos.setDestFile("ReportPPQ_"+ fileYear + fileMonth_1 + fileDayOfMonth +".xlsx");
+					petroquimicos.CopyReport(frame);					
+				}
+				
+				
+				//Ventas diarias
+				
+				searchDir = new File(SrcDirBase + "Ventas Diarias/" + year + "/" + monthName + "/");
+				fileFilter = new WildcardFileFilter("Ventas diarias*.xlsx");
+				File[] filesVentas = searchDir.listFiles(fileFilter);
+				Arrays.sort(filesVentas, NameFileComparator.NAME_INSENSITIVE_COMPARATOR);
+				
+				for (int j = 0; j < filesVentas.length; j++) {
+					System.out.println(filesVentas[j]);	
 					
-					balanceGraficos.setDestDir(DestDirName(fileCalendar));
-					balanceGraficos.setDestFile("Balance y gráficos PR_" + fileYear + fileMonth_1 + fileDayOfMonth +".xlsx");
-					balanceGraficos.CopyReport(frame);
-					if(filesPetroquimicos[j].toString().matches("(.*)ierre(.*)")){
-						System.out.println("Fin de mes: " + filesPetroquimicos[j]);
-						balanceGraficos.OverrideReport(frame);
+					Calendar fileCalendar = ReadExcelDateVentas(filesVentas[j]);
+					
+					String fileDayOfMonth = String.format("%02d", fileCalendar.get(Calendar.DAY_OF_MONTH) ) ; 
+					String fileMonth_1 = String.format("%02d", fileCalendar.get(Calendar.MONTH)+1);
+					//String file_MonthName = MonthName(fileCalendar.get(Calendar.MONTH));
+					int fileYear = fileCalendar.get(Calendar.YEAR);
+					
+					Report ventas = new Report(filesVentas[j]);					 
+					ventas.setDestDir(DestDirName(fileCalendar));
+					ventas.setDestFile("Ventas diarias " + fileYear +  fileMonth_1 + fileDayOfMonth  +".xlsx");
+					ventas.CopyReport(frame);
+				}
+				
+				
+				//Rohoy crudo
+				//IMPORTANTE: este debe tener la fecha del dia siguiente pero se debe de guardar en
+				// la carpeta de mes anteior, por ejemplo, si trae informacion del 31 de marzo entonces el nombre debe decir 1 de abril, 
+				// pero se debe de guardar en la carpeta de marzo.
+				//
+				searchDir = new File(SrcDirBase + "Rohoy/Crudo/" + year + "/" + monthName + "/");
+				fileFilter = new WildcardFileFilter("Resumen Operativo Crudo*.xlsx");
+				File[] filesRohoy = searchDir.listFiles(fileFilter);
+				Arrays.sort(filesRohoy, NameFileComparator.NAME_INSENSITIVE_COMPARATOR);
+				
+				for (int j = 0; j < filesRohoy.length; j++) {
+					System.out.println(filesRohoy[j]);				 
+					
+					Calendar fileCalendar = ReadExcelDateRohoy(filesRohoy[j]);
+					
+					String fileDayOfMonth = String.format("%02d", fileCalendar.get(Calendar.DAY_OF_MONTH) ) ; 
+					String fileMonth_1 = String.format("%02d", fileCalendar.get(Calendar.MONTH)+1);
+					//String file_MonthName = MonthName(fileCalendar.get(Calendar.MONTH));
+					int fileYear = fileCalendar.get(Calendar.YEAR);
+					
+					Report rohoy = new Report(filesRohoy[j]);
+					rohoy.setDestDir(DestDirName(fileCalendar));
+										
+					fileCalendar.add(Calendar.DAY_OF_YEAR, 1);
+					fileDayOfMonth = String.format("%02d", fileCalendar.get(Calendar.DAY_OF_MONTH) ) ; 
+					fileMonth_1 = String.format("%02d", fileCalendar.get(Calendar.MONTH)+1);
+					//String file_MonthName = MonthName(fileCalendar.get(Calendar.MONTH));
+					fileYear = fileCalendar.get(Calendar.YEAR);
+			        System.out.println("fecha de archvo mas  un dia: " + fileCalendar.getTime());
+					
+					rohoy.setDestFile("RohoyCrd_" + fileYear + fileMonth_1 + fileDayOfMonth + ".xlsx");
+					rohoy.CopyReport(frame);
+				}
+				
+
+												
+				//Crudo por campos
+			
+				searchDir = new File(SrcDirBase + "Crudo por campos/" + year + "/" + monthName + "/");
+				fileFilter = new WildcardFileFilter("Crudo por campos*.xls");
+				File[] filesCrudoCampos = searchDir.listFiles(fileFilter);
+				//Arrays.sort(filesCrudoCampos, NameFileComparator.NAME_INSENSITIVE_COMPARATOR);
+				System.out.println("Buscando en: "  + searchDir);
+				for (int j = 0; j < filesCrudoCampos.length; j++) {
+					if(filesCrudoCampos[j].toString().matches(".*[a-zA-z0-9]+\\.xls"))
+					{
+						System.out.println("Procesando" + filesCrudoCampos[j]  );						
+
+						Calendar fileCalendar = ReadExcelDateCrudoCampos(filesCrudoCampos[j],calendar);
+												
+						String fileDayOfMonth = String.format("%02d", fileCalendar.get(Calendar.DAY_OF_MONTH) ) ; 
+						String fileMonth_1 = String.format("%02d", fileCalendar.get(Calendar.MONTH)+1);
+						//String file_MonthName = MonthName(fileCalendar.get(Calendar.MONTH));
+						int fileYear = fileCalendar.get(Calendar.YEAR);
+						
+						
+						Report CrudoCampos = new Report(filesCrudoCampos[j]);					 
+						CrudoCampos.setDestDir(DestDirName(fileCalendar));
+						CrudoCampos.setDestFile("Crudo por campos " + fileYear +  fileMonth_1 + fileDayOfMonth  +".xls");
+						CrudoCampos.CopyReport(frame);
+						
+						
 					}
-					*/
 					
 					
 				}
 				
-				/*
-				//petroquimicos
-				Report ppq = new Report();
-				ppq.setSrctDir(SrcDirBase + "Petroquímicos/" + year + "/" + monthName + "/" );
-				ppq.setSrcFile("ReportPPQ_" + dayOfMonth + month_1 + (year-2000) + ".xlsx");
-				ppq.setDestDir(DestDirectory);
-				ppq.setDestFile("ReportPPQ_"+ year + month_1 + dayOfMonth +".xlsx");
-				ppq.CopyReport(frame);
-			*/
-
-
-				//Crudo por campos
-				
-				/*
-				//PODIM
-				ReportAgg podim =  new ReportAgg();
-				podim.setSrctDir(SrcDirBase + "PODIM/" + year +"/"+ monthName + "/" );
-				podim.setSrcFile("PODIM"+monthName.toUpperCase()+".xlsm");
-				podim.setDestDir(DestDirectory);
-				podim.setDestFile("PODIM_"+ year + month_1 + dayOfMonth +".xlsm");
-				podim.CopyReportBySDate(calendar,frame);
-
-				
-
-
-				//Rohoy crudo
-				Report rohoy = new Report();
-				rohoy.setSrctDir(SrcDirBase + "Rohoy/Crudo/" + year + "/" + monthName + "/");
-				rohoy.setSrcFile("Resumen Operativo Crudo "+ dayOfMonth + monthName.toLowerCase().substring(0,3) + (year-2000) + ".xlsx");
-				rohoy.setDestDir(DestDirectory);
-				rohoy.setDestFile("RohoyCrd_" + year + month_1 + dayOfMonth + ".xlsx");
-				rohoy.CopyReport(frame);
-
-				//Ventas diarias
-				Report ventasDiarias = new Report();
-				ventasDiarias.setSrctDir(SrcDirBase + "Ventas Diarias/" + year + "/" + monthName + "/");
-				ventasDiarias.setSrcFile("Ventas diarias "+ year +" "+ dayOfMonth  +" "+ monthName.toUpperCase() +".xlsx");
-				ventasDiarias.setDestDir(DestDirectory);
-				ventasDiarias.setDestFile("Ventas diarias " + year +  month_1 + dayOfMonth  +".xlsx");
-				ventasDiarias.CopyReport(frame);
-				*/
 			}
 			
 			System.out.println("-- fin del a copia");
@@ -252,13 +312,7 @@ public class Fuentes {
             Cell cell =  sheet.getRow(9).getCell(41);
                       
             Calendar myCal = Calendar.getInstance();
-            myCal.setTime(cell.getDateCellValue());
-           
-            /*
-            System.out.println(myCal.get(Calendar.DAY_OF_MONTH) + "/"
-            		+ myCal.get(Calendar.MONTH)+1 + "/"
-            		+ myCal.get(Calendar.YEAR));     
-            */		       
+            myCal.setTime(cell.getDateCellValue());                 
             
             file.close();
             return myCal;
@@ -276,6 +330,7 @@ public class Fuentes {
     {
         try
         {
+        	Calendar fileCalendar = (Calendar) calendar.clone();
             FileInputStream file = new FileInputStream(filepath);
  
             //Create Workbook instance holding reference to .xlsx file
@@ -287,29 +342,28 @@ public class Fuentes {
     		//Reading month name
     		Cell cell =  sheet.getRow(4).getCell(36);
     		int month = MonthNametoInt(cell.getStringCellValue());
-    		calendar.set(Calendar.MONTH,month);   
+    		fileCalendar.set(Calendar.MONTH,month);   
     		
     		//Reading "1" if is last day of month
     		cell =  sheet.getRow(4).getCell(39);
     		int lastDay = (int) cell.getNumericCellValue();
     		if(lastDay == 1){
-    			calendar.add(Calendar.MONTH, -1);
-    			System.out.println("corte de mes");
+    			fileCalendar.add(Calendar.MONTH, -1);
+    			System.out.println("cierre de mes");
     		}
     		
     		//Reading last day with data
             cell =  sheet.getRow(9).getCell(41);
             int currentDay = (int) cell.getNumericCellValue();            
             /* Calendar manual set */
-    		calendar.set(Calendar.DAY_OF_MONTH,currentDay);
-            System.out.println(  currentDay +" " + calendar.get(Calendar.DAY_OF_MONTH));
+            fileCalendar.set(Calendar.DAY_OF_MONTH,currentDay);
+            
+           // System.out.println(  currentDay +" " + calendar.get(Calendar.DAY_OF_MONTH));
 
-            System.out.println(calendar.get(Calendar.DAY_OF_MONTH) + "/"
-            		+ MonthName(calendar.get(Calendar.MONTH)) + "/"
-            		+ calendar.get(Calendar.YEAR));     
+            System.out.println("clon modificado: " + fileCalendar.getTime());
             		       
             file.close();
-            return calendar;            
+            return fileCalendar;            
         }
         catch (Exception e)
         {
@@ -317,4 +371,128 @@ public class Fuentes {
         }
 		return null;
     }
+	
+	
+	static Calendar  ReadExcelDateVentas(File filepath)
+    {
+		try
+        {
+            FileInputStream file = new FileInputStream(filepath);
+ 
+            //Create Workbook instance holding reference to .xlsx file
+            XSSFWorkbook workbook = new XSSFWorkbook(file);
+ 
+            //Get first/desired sheet from the workbook
+            XSSFSheet sheet = workbook.getSheetAt(0);
+            Cell cell =  sheet.getRow(6).getCell(13);
+                      
+            Calendar myCal = Calendar.getInstance();
+            myCal.setTime(cell.getDateCellValue());
+                  
+            
+            file.close();
+            return myCal;
+            
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+		return null;
+    }
+	
+	static Calendar  ReadExcelDateRohoy(File filepath)
+    {
+		try
+        {
+            FileInputStream file = new FileInputStream(filepath);
+ 
+            //Create Workbook instance holding reference to .xlsx file
+            XSSFWorkbook workbook = new XSSFWorkbook(file);
+ 
+            //Get first/desired sheet from the workbook
+            XSSFSheet sheet = workbook.getSheetAt(0);
+            Cell cell =  sheet.getRow(4).getCell(5);
+                      
+            Calendar myCal = Calendar.getInstance();
+            myCal.setTime(cell.getDateCellValue());
+           
+            
+            file.close();
+            return myCal;
+            
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+		return null;
+    }
+	
+	static Calendar  ReadExcelDateCrudoCampos(File filepath, Calendar calendar)
+    {
+		try
+        {
+			Calendar fileCalendar = (Calendar) calendar.clone();
+			
+			//System.out.println("Procesando: " + filepath);
+			
+            FileInputStream file = new FileInputStream(filepath);
+ 
+            //Create Workbook instance holding reference to .xlsx file
+           // XSSFWorkbook workbook = new XSSFWorkbook(file);            
+            FileInputStream fileIn=new FileInputStream(filepath);
+    		Workbook workbook = WorkbookFactory.create(fileIn);      //this reads the file
+ 
+            //Get first/desired sheet from the workbook
+    		final Sheet sheet= workbook .getSheet("CORP.PROD");
+            //XSSFSheet sheet = (XSSFSheet) workbook.getSheetAt(0);
+    		
+            //initial point to search
+            Cell cellDay =  sheet.getRow(9).getCell(4);
+            Cell cellData = sheet.getRow(10).getCell(4);
+           
+            
+            //Searching real values
+            int infoDay = 4;         
+            while (cellData.getStringCellValue().equals("(R)")) {
+            	infoDay++;	
+            	cellDay =  sheet.getRow(9).getCell(infoDay);
+            	cellData =  sheet.getRow(10).getCell(infoDay);
+            	//System.out.println("-");
+            				
+			}
+            
+            infoDay--;
+        	cellDay =  sheet.getRow(9).getCell(infoDay);
+        	cellData =  sheet.getRow(10).getCell(infoDay);
+        	//System.out.println(cellDay.getNumericCellValue());            
+           
+         
+            int currentDay = (int) cellDay.getNumericCellValue();            
+            /* Calendar manual set */
+            //System.out.println("   antes de modificacion : "+ calendar.getTime());
+            fileCalendar.set(Calendar.DAY_OF_MONTH,currentDay);
+            //System.out.println("   despues de modificacion: "+ calendar.getTime());
+
+            
+            file.close();
+            return fileCalendar;
+            
+            
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+		return null;
+    }
+	
+	static String PrintCalendar(Calendar calendarToPrint){
+		
+        return calendarToPrint.get(Calendar.DAY_OF_MONTH) + "/"
+        		+ calendarToPrint.get(Calendar.MONTH) + "/"
+        		+ calendarToPrint.get(Calendar.YEAR);     
+        	
+	}
 }
