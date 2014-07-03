@@ -2,6 +2,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.io.*;
 
+import javax.swing.JFrame;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.comparator.NameFileComparator;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
@@ -23,8 +25,13 @@ public class Fuentes {
 		//calendar.set(Calendar.MONTH,0);
 		//calendar.set(Calendar.DAY_OF_MONTH,1);
 		String SrcDirBase = "Y:/TOIIP/Fuentes/";
-
+		
 		HideToSystemTray frame =  new HideToSystemTray();
+
+
+
+		
+		
 		int monthsToCopy = 6;
 
 		while(true){
@@ -42,6 +49,7 @@ public class Fuentes {
 			ReportAgg podim =  new ReportAgg();
 			podim.setSrctDir(SrcDirBase + "PODIM/" + year +"/"+ monthName + "/" );
 			podim.setSrcFile("PODIM"+monthName.toUpperCase()+".xlsm");
+			System.out.println("Buscando PODIM en: " + SrcDirBase + "PODIM/" + year +"/"+ monthName + "/" + "PODIM"+monthName.toUpperCase()+".xlsm" );
 			podim.setDestDir(DestDirectory);
 			podim.setDestFile("PODIM_"+ year + month_1 + dayOfMonth +".xlsm");
 			podim.CopyReportBySDate(calendar,frame);
@@ -49,8 +57,6 @@ public class Fuentes {
 			calendar.add(Calendar.MONTH, -monthsToCopy);
 			
 			for (int i = 0; i < monthsToCopy; i++) {
-				System.out.println("i=" + i + "<" + monthsToCopy );
-				System.out.println("dentro del ciclo antes de incremento" + calendar.getTime());
 				calendar.add(Calendar.MONTH, +1);
 				System.out.println("--" + calendar.getTime());
 
@@ -100,6 +106,7 @@ public class Fuentes {
 				searchDir = new File(SrcDirBase + "Petroquímicos/" + year + "/" + monthName + "/");
 				fileFilter = new WildcardFileFilter("ReportPPQ_*.xlsx");
 				File[] filesPetroquimicos = searchDir.listFiles(fileFilter);
+				try{
 				Arrays.sort(filesPetroquimicos, NameFileComparator.NAME_INSENSITIVE_COMPARATOR);
 				
 				for (int j = 0; j < filesPetroquimicos.length; j++) {
@@ -117,6 +124,11 @@ public class Fuentes {
 					petroquimicos.setDestFile("ReportPPQ_"+ fileYear + fileMonth_1 + fileDayOfMonth +".xlsx");
 					petroquimicos.CopyReport(frame);					
 				}
+				}
+				catch(NullPointerException e)  {
+					System.out.println("No se puede leer el contenido del directorio:" + searchDir );
+				}
+				
 				
 				
 				//Ventas diarias
@@ -213,7 +225,7 @@ public class Fuentes {
 			}
 			
 			System.out.println("-- fin del a copia");
-			Thread.sleep(100 * 1000);
+			Thread.sleep(10 * 60 * 1000); //milliseconds
 		}
 	}
 
@@ -221,6 +233,8 @@ public class Fuentes {
 
 	static String DestDirName(Calendar calendar){
 		String DestDirBase = "Y:/Servicio social/2014/Javier Garduño/PruebasTransitorio Carga Masiva Nuevo TOIIP/";
+		//String DestDirBase = "Copia/";
+
 		String monthDirName = String.format("%02d", calendar.get(Calendar.MONTH)+1 ) +
 				"_" + MonthName(calendar.get(Calendar.MONTH)).substring(0,3) +
 				"_"+ calendar.get(Calendar.YEAR) + "/";

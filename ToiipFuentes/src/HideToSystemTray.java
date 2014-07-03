@@ -18,7 +18,9 @@ public class HideToSystemTray extends JFrame{
 	TrayIcon trayIcon;
 	SystemTray tray;
 	
+	FileChooser chooser = new FileChooser();
 	JTextArea logArea;
+	
 	
 
 	HideToSystemTray(){
@@ -112,12 +114,15 @@ public class HideToSystemTray extends JFrame{
 		setSize(800, 800);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
+		//chooser.setSize(10, 50);
+		//add(chooser, BorderLayout.NORTH);
+		
 		logArea = new JTextArea(40,1 );
         logArea.append("Eventos:\n ");
         logArea.setEditable(false);
         
         JScrollPane jp = new JScrollPane(logArea);        
-        add(jp, BorderLayout.NORTH);
+        add(jp, BorderLayout.CENTER);
         jp.setAutoscrolls(true);
 	}
 	

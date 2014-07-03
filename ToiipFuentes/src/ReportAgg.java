@@ -38,7 +38,8 @@ public class ReportAgg extends Report{
 					}
 					if(reportDestFile.exists()){
 						System.out.println("Ya esiste el destino " + reportDestFile.toString() + "\"");
-					}					
+					}	
+					
 				}
 				
 			} catch (IOException e) {
