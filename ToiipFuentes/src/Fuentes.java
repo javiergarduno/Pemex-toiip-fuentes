@@ -32,7 +32,7 @@ public class Fuentes {
 
 		
 		
-		int monthsToCopy = 6;
+		int monthsToCopy = 2;
 
 		while(true){
 			Calendar calendar = Calendar.getInstance();	
